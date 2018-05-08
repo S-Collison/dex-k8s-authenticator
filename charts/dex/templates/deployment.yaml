@@ -53,12 +53,6 @@ spec:
         - name: http
           containerPort: 5556
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 5556
-          initialDelaySeconds: 5
-          timeoutSeconds: 1
         volumeMounts:
         - name: config
           mountPath: /etc/dex
