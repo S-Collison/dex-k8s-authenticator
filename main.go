@@ -19,6 +19,8 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/gorilla/mux"
 )
 
 var (
@@ -79,6 +81,7 @@ type Config struct {
 	TLS_Key    string
 	IDP_Ca_URI string
 	Logo_Uri   string
+	Base_Path   string
 }
 
 func substituteEnvVars(text string) string {
@@ -97,7 +100,6 @@ func substituteEnvVars(text string) string {
 // Setup http-clients and oidc providers
 // Define per-cluster handlers
 func start_app(config Config) {
-
 	// Config validation
 	listenURL, err := url.Parse(config.Listen)
 	if err != nil {
@@ -172,26 +174,31 @@ func start_app(config Config) {
 		http.HandleFunc(callback_uri, cluster.handleCallback)
 		log.Printf("Registered callback handler at: %s", callback_uri)
 
-		login_uri := path.Join("/login", cluster.Name)
+		login_uri := path.Join(config.Base_Path,"/login", cluster.Name)
 		http.HandleFunc(login_uri, cluster.handleLogin)
 		log.Printf("Registered login handler at: /login/%s", cluster.Name)
 	}
 
+	router := mux.NewRouter()
+
 	// Index page
-	http.HandleFunc("/", config.handleIndex)
+	router.HandleFunc("/", config.handleIndex)
 
 	// Serve static html assets
+	prefix := path.Join(config.Base_Path, "/static/")
 	fs := http.FileServer(http.Dir("html/static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	log.Printf("Base prefix: %s, Base path: %s", prefix, config.Base_Path)
+	router.PathPrefix(prefix).Handler(http.StripPrefix(prefix, fs))
 
 	// Determine whether to use TLS or not
 	switch listenURL.Scheme {
 	case "http":
 		log.Printf("Listening on %s", config.Listen)
-		http.ListenAndServe(listenURL.Host, nil)
+		http.ListenAndServe(listenURL.Host, router)
 	case "https":
 		log.Printf("Listening on %s", config.Listen)
-		http.ListenAndServeTLS(listenURL.Host, config.TLS_Cert, config.TLS_Key, nil)
+		http.ListenAndServeTLS(listenURL.Host, config.TLS_Cert, config.TLS_Key, router)
 	default:
 		fmt.Errorf("Listen address %q is not using http or https", config.Listen)
 	}
