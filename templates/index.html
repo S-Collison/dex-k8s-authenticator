@@ -8,9 +8,9 @@
 
     <title>Generate Kubernetes Token</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/static/main.css" rel="stylesheet" type="text/css">
-    <link href="/static/styles.css" rel="stylesheet" type="text/css">
-    <link rel="icon" href="/static/favicon.png">
+    <link href="static/main.css" rel="stylesheet" type="text/css">
+    <link href="static/styles.css" rel="stylesheet" type="text/css">
+    <link rel="icon" href="static/favicon.png">
   </head>
 
   <body class="theme-body">
@@ -26,16 +26,16 @@
 
       <div class="theme-panel">
         <h2 class="theme-heading">Generate Kubernetes Token</h2>
-        <div>        
+        <div>
             <p>
               Select which cluster you require a token for:
             </p>
-        
-            {{ range $cluster := .Clusters }}          
+
+            {{ range $cluster := .Clusters }}
 
             <div class="theme-form-row">
                 <p class="theme-form-description">{{$cluster.Description}}</p>
-                <a href="/login/{{$cluster.Name}}" target="_self">                    
+                <a href="{{.Base_Path}}/login/{{$cluster.Name}}" target="_self">
                   <button class="dex-btn theme-btn-provider">
                     <span class="dex-btn-icon dex-btn-icon--local"></span>
                     <span class="dex-btn-text">{{$cluster.Short_Description}}</span>
@@ -43,7 +43,7 @@
                 </a>
               </div>
               {{ end }}
-            </div>    
+            </div>
         </div>
       </div>
     </div>

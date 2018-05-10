@@ -13,14 +13,16 @@ data:
     {{- with .Values.dexK8sAuthenticator }}
     listen: http://0.0.0.0:{{ default "5555" .port }}
     debug: {{ default "false" .debug }}
+    {{- if .basePath }}
+    base_path: {{ .basePath }}
+    {{- end }}
     {{- if .logoUrl }}
     logo_uri: {{ .logoUrl }}
     {{- end }}
-    {{- if and .tlsCert .tlsKey }} 
+    {{- if and .tlsCert .tlsKey }}
     tls_cert: "{{ .tlsCert }}"
     tls_key: "{{ .tlsKey }}"
     {{- end }}
     clusters:
 {{ toYaml .clusters | indent 4 }}
     {{- end }}
-
