@@ -13,8 +13,8 @@ data:
     {{- with .Values.dexK8sAuthenticator }}
     listen: http://0.0.0.0:{{ default "5555" .port }}
     debug: {{ default "false" .debug }}
-    {{- if .basePath }}
-    base_path: {{ .basePath }}
+    {{- if .Base_Path }}
+    base_path: {{ .Base_Path }}
     {{- end }}
     {{- if .logoUrl }}
     logo_uri: {{ .logoUrl }}
