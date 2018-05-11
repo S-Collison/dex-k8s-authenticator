@@ -169,11 +169,13 @@ func start_app(config Config) {
 		}
 
 		// Each cluster gets a different login and callback URL
-		callback_uri := path.Join(base_redirect_uri.Path)
-		http.HandleFunc(callback_uri, cluster.handleCallback)
-		log.Printf("Registered callback handler at: %s", callback_uri)
+		//callback_uri := path.Join(base_redirect_uri.Path)
 
-		login_uri := path.Join(config.Base_Path, "login", cluster.Name)
+		callback_uri := path.Join("/callback")
+		http.HandleFunc(callback_uri, cluster.handleCallback)
+		log.Printf("Registered callback handler at: %s, via %s", callback_uri, base_redirect_uri.Path)
+
+		login_uri := path.Join("/login", cluster.Name)
 		http.HandleFunc(login_uri, cluster.handleLogin)
 		log.Printf("Registered login handler at: %s", login_uri)
 	}
