@@ -53,6 +53,14 @@ spec:
         - name: http
           containerPort: 5556
           protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: {{.Values.ingress.path }}/
+            port: http
+        readinessProbe:
+          httpGet:
+            path: {{.Values.ingress.path }}/
+            port: http
         volumeMounts:
         - name: config
           mountPath: /etc/dex
