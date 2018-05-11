@@ -55,11 +55,11 @@ spec:
           protocol: TCP
         livenessProbe:
           httpGet:
-            path: {{.Values.ingress.path }}/
+            path: /
             port: http
         readinessProbe:
           httpGet:
-            path: {{.Values.ingress.path }}/
+            path: /
             port: http
         volumeMounts:
         - name: config
