@@ -63,7 +63,7 @@ pre {
 
 .dex-btn-icon--local {
   background-color: #84B6EF;
-  background-image: url(/static/button.svg);
+  background-image: url(button.svg);
 }
 
 .dex-btn-text {
@@ -99,4 +99,3 @@ div.groups {
 div.command {
 margin-top: 15px;
 }
-
