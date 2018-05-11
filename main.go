@@ -19,8 +19,6 @@ import (
 	"github.com/coreos/go-oidc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-
-	"github.com/gorilla/mux"
 )
 
 var (
@@ -81,7 +79,7 @@ type Config struct {
 	TLS_Key    string
 	IDP_Ca_URI string
 	Logo_Uri   string
-	Base_Path   string
+	Base_Path  string
 }
 
 func substituteEnvVars(text string) string {
@@ -100,6 +98,7 @@ func substituteEnvVars(text string) string {
 // Setup http-clients and oidc providers
 // Define per-cluster handlers
 func start_app(config Config) {
+
 	// Config validation
 	listenURL, err := url.Parse(config.Listen)
 	if err != nil {
@@ -174,31 +173,26 @@ func start_app(config Config) {
 		http.HandleFunc(callback_uri, cluster.handleCallback)
 		log.Printf("Registered callback handler at: %s", callback_uri)
 
-		login_uri := path.Join(config.Base_Path,"/login", cluster.Name)
+		login_uri := path.Join(config.Base_Path, "login", cluster.Name)
 		http.HandleFunc(login_uri, cluster.handleLogin)
-		log.Printf("Registered login handler at: /login/%s", cluster.Name)
+		log.Printf("Registered login handler at: %s", login_uri)
 	}
 
-	router := mux.NewRouter()
-
 	// Index page
-	router.HandleFunc("/", config.handleIndex)
+	http.HandleFunc("/", config.handleIndex)
 
 	// Serve static html assets
-	prefix := path.Join(config.Base_Path, "/static/")
 	fs := http.FileServer(http.Dir("html/static"))
-
-	log.Printf("Base prefix: %s, Base path: %s", prefix, config.Base_Path)
-	router.PathPrefix(prefix).Handler(http.StripPrefix(prefix, fs))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Determine whether to use TLS or not
 	switch listenURL.Scheme {
 	case "http":
 		log.Printf("Listening on %s", config.Listen)
-		http.ListenAndServe(listenURL.Host, router)
+		http.ListenAndServe(listenURL.Host, nil)
 	case "https":
 		log.Printf("Listening on %s", config.Listen)
-		http.ListenAndServeTLS(listenURL.Host, config.TLS_Cert, config.TLS_Key, router)
+		http.ListenAndServeTLS(listenURL.Host, config.TLS_Cert, config.TLS_Key, nil)
 	default:
 		fmt.Errorf("Listen address %q is not using http or https", config.Listen)
 	}
