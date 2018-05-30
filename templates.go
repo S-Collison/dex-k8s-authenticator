@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"strings"
 )
 
 // compile all templates and cache them
@@ -51,15 +50,12 @@ func (cluster *Cluster) renderToken(w http.ResponseWriter,
 		panic(err)
 	}
 
-	email := data["email"].(string)
-	unix_username := strings.Split(email, "@")[0]
-
 	token_data := templateData{
 		IDToken:          idToken,
 		RefreshToken:     refreshToken,
 		RedirectURL:      cluster.Redirect_URI,
 		Claims:           string(claims),
-		Username:         unix_username,
+		Username:         data["email"].(string),
 		Issuer:           data["iss"].(string),
 		ClusterName:      cluster.Name,
 		ShortDescription: cluster.Short_Description,
